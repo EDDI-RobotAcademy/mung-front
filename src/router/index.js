@@ -1,9 +1,12 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from "@/views/HomeView";
-import NaverLogin from "@/views/login/NaverLogin";
-import NaverLoginAccess from "@/views/login/NaverLoginAccess";
-import GoogleLogin from "@/views/login/GoogleLogin";
+import NaverLogin from "@/views/Sociallogin/NaverLogin";
+import GoogleLogin from "@/views/Sociallogin/GoogleLogin";
+import AuthToken from "@/views/Sociallogin/AuthToken";
+import SignUpPage from "@/views/profile/MemberProfileRegPage";
+import MemberProfileRegPage from "@/views/profile/MemberProfileRegPage";
+import PetProfileRegPage from "@/views/profile/PetProfileRegPage";
 
 
 Vue.use(VueRouter)
@@ -20,15 +23,25 @@ const routes = [
     component: NaverLogin
   },
   {
-    path: "/login/naver",
-    name: "NaverLogin",
-    component: NaverLoginAccess
+    path: "/login/token",
+    name: "AuthToken",
+    component: AuthToken
   },
   {
     path: "/google",
     name: "GoogleLogin",
     component: GoogleLogin
   },
+  {
+    path: "/member-profile-reg-page",
+    name: "MemberProfileRegPage",
+    component: MemberProfileRegPage
+  },
+  {
+    path: "/pet-profile-reg-page",
+    name: "PetProfileRegPage",
+    component: PetProfileRegPage
+  }
 ]
 
 const router = new VueRouter({
