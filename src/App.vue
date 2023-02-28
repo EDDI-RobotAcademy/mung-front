@@ -1,8 +1,11 @@
 <template>
   <v-app>
-    <v-main>
-      <router-view/>
-    </v-main>
+    <div>
+      <v-main>
+        <main-header/>
+          <router-view/>
+      </v-main>
+    </div>
   </v-app>
 </template>
 
