@@ -55,13 +55,27 @@ export default {
         const reader = new FileReader();
         reader.onload = (e) => {
           this.images.push(e.target.result);
+          const blob = this.dataURItoBlob(e.target.result);
+          this.$emit('GetImgData', 'imgReg', blob);
         };
+
         reader.readAsDataURL(file);
       }
     },
     getChildData() {
       console.log('Get Img Child data');
-      this.$emit('GetImgData', 'imgReg', this.images);
+      this.$emit('update:images', 'GetImgData', 'imgReg', this.images);
+    },
+    dataURItoBlob(dataURI) {
+      const byteString = atob(dataURI.split(',')[1]);
+      const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([ab], { type: mimeString });
+      return blob;
     },
     deleteImage(index) {
       this.images.splice(index, 1);
