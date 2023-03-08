@@ -2,12 +2,12 @@
   <div>
     <router-link to="/login">네이버 간편 로그인 테스트</router-link> |
     <router-link to="/google">구글 간편 로그인 테스트</router-link> |
+    <router-link to="/mung-wiki">멍 위키 UI</router-link> |
   </div>
 </template>
 
 <script>
-
-  export default {
-    name: 'Home',
-  }
+export default {
+  name: 'Home',
+};
 </script>
