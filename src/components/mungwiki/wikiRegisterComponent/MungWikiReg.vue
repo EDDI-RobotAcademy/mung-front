@@ -7,8 +7,13 @@
     <div style="margin-bottom: 20px">
       <wiki-document-reg ref="DocumentWiki" @GetDocumentData="onChildDataChanged" />
     </div>
-    <button @click="getChildData">데이터 확인~</button>
-    images : {{ images }} wikiDocument : {{ wikiDocument }} Status : {{ Status }}
+
+    <button
+      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-auto block w-1/2 mb-4"
+      @click="submitToServer"
+    >
+      위키 데이터 저장
+    </button>
   </div>
 </template>
 
@@ -16,6 +21,7 @@
 import ImgReg from '@/components/mungwiki/wikiRegisterComponent/imgReg';
 import WikiStatusReg from '@/components/mungwiki/wikiRegisterComponent/WikiStatusReg';
 import WikiDocumentReg from '@/components/mungwiki/wikiRegisterComponent/wikiDocumentReg';
+import { mapActions } from 'vuex';
 export default {
   name: 'mungWikiReg',
   components: { WikiDocumentReg, WikiStatusReg, ImgReg },
@@ -31,32 +37,82 @@ export default {
         indoorAdaptLevel: Number,
         selectedType: '',
       },
+      totalStatus: Number,
+      validationFlag: false,
     };
   },
   methods: {
+    ...mapActions(['requestRegisterWikiToString']),
     getChildData() {
       console.log('Get child data');
       this.$refs.StatusWiki.getChildData();
       this.$refs.DocumentWiki.getChildData();
-      this.$refs.ImgWiki.getChildData();
+
+      this.validationCheck();
+    },
+    validationCheck() {
+      if (
+        ![
+          this.Status.activityLevel,
+          this.Status.intelligenceLevel,
+          this.Status.indoorAdaptLevel,
+          this.Status.sheddingLevel,
+          this.Status.sociabilityLevel,
+        ].every((level) => level >= 0 && level <= 5)
+      ) {
+        alert('강아지 들의 능력은 0-5사이의 숫자만 입력 가능합니다.');
+        this.validationFlag = false;
+      } else {
+        this.validationFlag = true;
+      }
     },
     onChildDataChanged(childName, data) {
       console.log(`ChildName ${childName} data changed:`, data);
       if (childName == 'imgReg') {
-        this.images = data;
+        this.images.push(data);
+        console.log(this.images);
       } else if (childName == 'WikiStatusReg') {
         this.Status = data;
       } else if (childName == 'wikiDocumentReg') {
         this.wikiDocument = data;
       }
     },
-    submitToServer() {
+    calculateTotalStatus() {
+      if (this.validationFlag) {
+        this.totalStatus =
+          (this.Status.activityLevel +
+            this.Status.intelligenceLevel +
+            this.Status.indoorAdaptLevel +
+            this.Status.sheddingLevel +
+            this.Status.sociabilityLevel) /
+          5;
+      }
+    },
+    async submitToServer() {
+      this.getChildData();
+      this.calculateTotalStatus();
       console.log('wiki register To Spring');
       let formData = new FormData();
 
       for (let i = 0; i < this.images.length; i++) {
-        formData.append('images', this.image[i]);
+        formData.append('images', this.images[i]);
       }
+
+      let wikiInfo = {
+        dogType: this.Status.selectedType,
+        intelligenceLevel: this.Status.intelligenceLevel,
+        sheddingLevel: this.Status.sheddingLevel,
+        sociabilityLevel: this.Status.sociabilityLevel,
+        activityLevel: this.Status.activityLevel,
+        indoorAdaptLevel: this.Status.indoorAdaptLevel,
+        totalStatus: this.totalStatus,
+        documentation: this.wikiDocument,
+      };
+      console.log(formData.get('images'));
+      formData.append('info', new Blob([JSON.stringify(wikiInfo)], { type: 'application/json' }));
+      console.log(formData.get('info'));
+
+      await this.requestRegisterWikiToString(formData);
     },
   },
 };
