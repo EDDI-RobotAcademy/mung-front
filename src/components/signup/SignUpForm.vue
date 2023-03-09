@@ -2,41 +2,38 @@
   <div class="min-h-screen bg-gray-100">
     <div class="flex justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- 중앙 게시판 -->
-      <form @submit.prevent="onSubmit()" ref="form">
+      <form @submit.prevent ref="form">
         <div class="py-10 mx-auto col-span-6">
           <div class="bg-white rounded-lg shadow p-10">
             <div class="mx-8 py-8 flex justify-center">
               <div class="table-row">
                 <h2 class="text-3xl font-medium">🐶 Join MungMung 💜</h2>
-                <div class="flex justify-between items-center space-x-0.5 text-sm my-5">
-                  <div>
-                    <input type="radio" v-model="memberType" value="normal" @click="emailValidate" />
-                    일반 회원가입
-                  </div>
-                  <div>
-                    <input type="radio" v-model="memberType" value="admin" @click="emailValidate" />
-                    관리자 회원가입
-                  </div>
+                <div class="container h-10"></div>
+                <div class="flex text-sm">
+                  <input type="checkbox" v-model="isAdmin" class="mx-1" />
+                  관리자로 회원가입
                 </div>
+                <div class="container h-5"></div>
                 <!--이메일 인풋-->
                 <p class="text-sm">이메일</p>
                 <div class="flex justify-between items-center space-x-1">
                   <input
                     class="h-10 w-3/4 border rounded-lg px-2"
                     v-model="email"
-                    @input="emailValidate"
+                    @input="normalEmailValidate"
                     type="text"
                     maxlength="50"
                     placeholder="이메일 입력"
                   />
                   <button
                     class="w-1/4 h-10 text-white text-sm rounded-lg bg-indigo-500 hover:bg-indigo-600"
-                    :disabled="!emailPass"
                     @click="emailDupCheck"
+                    :disabled="!emailPass"
                   >
                     중복 확인
                   </button>
                 </div>
+                <p class="text-xs text-red-600" v-show="email.length < 1">필수 입력 항목</p>
                 <p class="text-xs text-red-600" v-show="email.length > 0 && !emailPass">
                   이메일 주소를 정확히 입력하세요
                 </p>
@@ -44,42 +41,47 @@
                 <!--비밀번호 인풋-->
                 <p class="text-sm">비밀번호</p>
                 <input
-                  class="h-10 w-full border rounded-lg"
+                  class="h-10 w-full border rounded-lg px-2"
                   v-model="password"
                   @input="passwordValidate"
                   type="password"
                   maxlength="50"
-                  placeholder=" 4 ~ 20자리의 영문, 숫자 조합을 입력하세요"
+                  placeholder="4 ~ 20자리의 영문, 숫자 조합 입력"
                 />
+                <p class="text-xs text-red-600" v-show="password.length < 1">필수 입력 항목</p>
                 <p class="text-xs text-red-600" v-show="password.length > 0 && !passwordPass">
-                  4자 ~ 20자의 영문, 숫자 조합을 입력하세요
+                  4자 ~ 20자의 영문, 숫자 조합 입력
                 </p>
                 <div class="container h-5"></div>
                 <!--닉네임 인풋-->
                 <p class="text-sm">닉네임</p>
                 <div class="flex justify-between items-center space-x-1">
                   <input
-                    class="h-10 w-3/4 border rounded-lg"
+                    class="h-10 w-3/4 border rounded-lg px-2"
                     v-model="nickname"
                     @input="nicknameValidate"
                     type="text"
                     maxlength="50"
-                    placeholder=" 10자 이하 닉네임 입력"
+                    placeholder="10자 이하 닉네임 입력"
                   />
                   <button
                     class="w-1/4 h-10 text-white text-sm rounded-lg bg-indigo-500 hover:bg-indigo-600"
-                    :disabled="!nicknamePass"
                     @click="nicknameDupCheck"
+                    :disabled="!nicknamePass"
                   >
                     중복 확인
                   </button>
                 </div>
-
+                <p class="text-xs text-red-600" v-show="nickname.length < 1">필수 입력 항목</p>
                 <p class="text-xs text-red-600" v-show="nickname.length > 0 && !nicknamePass">
                   공백, 특수 문자를 제외한 10자 이하 닉네임을 입력하세요
                 </p>
                 <div class="container h-20"></div>
-                <button class="h-12 w-full text-white rounded-lg bg-indigo-500 hover:bg-indigo-600">
+                <button
+                  class="h-12 w-full text-white rounded-lg bg-indigo-500 hover:bg-indigo-600"
+                  @click="onSubmit"
+                  :disabled="!emailPass || !passwordPass || !nicknamePass"
+                >
                   MungMung과 함께하기
                 </button>
               </div>
