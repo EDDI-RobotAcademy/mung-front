@@ -92,7 +92,12 @@
 </template>
 
 <script>
-import { requestCheckDupEmailToSpring, requestCheckDupNicknameToSpring } from '@/api/services/authService';
+import {
+  requestCheckDupEmailToSpring,
+  requestCheckDupNicknameToSpring,
+  requestSignUpToSpring,
+} from '@/api/services/authService';
+import router from '@/router';
 
 export default {
   name: 'SignUpForm',
@@ -106,34 +111,44 @@ export default {
       nicknamePass: false,
       emailAvailable: false,
       nicknameAvailable: false,
+      isAdmin: false,
       memberType: 'normal',
     };
   },
   methods: {
-    emailValidate() {
-      if (this.memberType === 'normal') {
-        this.emailPass = this.email.match(
-          /^(([^<>()[\]\\.,;:\s@]+(\.[^<>()[\]\\.,;:\s@]+)*)|(.+))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-        );
-      } else {
-        this.emailPass = this.email.match(/^(([^<>()[\]\\.,;:\s@]+(\.[^<>()[\]\\.,;:\s@]+)*)|(.+))@mung.com$/);
-      }
+    normalEmailValidate() {
+      this.emailAvailable = false;
+      this.emailPass = this.email.match(
+        /^(([^<>()[\]\\.,;:\s@]+(\.[^<>()[\]\\.,;:\s@]+)*)|(.+))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      );
+    },
+    adminEmailValidate() {
+      this.emailAvailable = false;
+      this.emailPass = this.email.match(/^(([^<>()[\]\\.,;:\s@]+(\.[^<>()[\]\\.,;:\s@]+)*)|(.+))@mung.com$/);
     },
     nicknameValidate() {
-      const nicknameValid = this.nickname.match(/^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9|*]{1,10}$/);
-      this.nicknamePass = !!nicknameValid;
+      this.nicknameAvailable = false;
+      this.nicknamePass = this.nickname.match(/^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9|*]{1,10}$/);
     },
     passwordValidate() {
       const passwordValid = this.password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,20}$/);
       this.passwordPass = !!passwordValid;
     },
     async emailDupCheck() {
-      const { email } = this;
-      this.emailAvailable = await requestCheckDupEmailToSpring(email);
-      if (this.emailAvailable) {
-        alert('사용가능한 이메일입니다');
+      if (this.isAdmin) {
+        this.adminEmailValidate();
+      }
+
+      if (this.emailPass) {
+        const { email } = this;
+        this.emailAvailable = await requestCheckDupEmailToSpring(email);
+        if (this.emailAvailable) {
+          alert('사용가능한 이메일입니다.');
+        } else {
+          alert('이미 가입된 이메일입니다.');
+        }
       } else {
-        alert('이미 가입된 이메일입니다.');
+        alert('관리자로 회원가입을 선택하셨다면 가입 가능한 계정을 입력하세요');
       }
     },
     async nicknameDupCheck() {
@@ -145,15 +160,28 @@ export default {
         alert('이미 가입된 닉네임입니다.');
       }
     },
-    // onSubmit() {
-    //   // alert('타입 잘 나옴?' + this.memberType);
-    //   if (this.emailAvailable && this.nicknameAvailable && this.passwordPass) {
-    //     const { email, password, nickname, memberType } = this;
-    //     this.$emit('submit', { email, password, nickname, memberType });
-    //   } else {
-    //     alert('올바른 정보를 입력하세요!');
-    //   }
-    // },
+    async onSubmit() {
+      console.log('회원가입~~~!!!');
+      if (this.isAdmin) {
+        this.memberType = 'admin';
+      }
+      if (this.emailAvailable) {
+        if (this.nicknameAvailable) {
+          const { email, password, nickname, memberType } = this;
+          const result = await requestSignUpToSpring({ email, password, nickname, memberType });
+          if (result) {
+            alert('회원가입 성공!');
+            await router.push('/login');
+          } else {
+            console.log('회원가입 실패ㅠㅠ');
+          }
+        } else {
+          alert('닉네임 중복 검사를 진행하세요!');
+        }
+      } else {
+        alert('이메일 중복 검사를 진행하세요!');
+      }
+    },
   },
 };
 </script>
