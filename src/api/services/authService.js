@@ -10,3 +10,10 @@ export const requestCheckDupNicknameToSpring = async (nickname) => {
   const res = await mainRequest.get(`/member/check-nickname/${nickname}`);
   return res.data;
 };
+
+export const requestSignUpToSpring = async (signUpData) => {
+  console.log('requestSignUpToSpring()');
+  const { email, password, nickname, memberType } = signUpData;
+  const res = await mainRequest.post('/member/sign-up', { email, password, nickname, memberType });
+  return res.data;
+};

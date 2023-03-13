@@ -4,6 +4,7 @@ import HomeView from '@/views/HomeView';
 import NaverLogin from '@/views/login/NaverLogin';
 import GoogleLogin from '@/views/login/GoogleLogin';
 import WalkingDogBoardView from '@/views/walkingDog/WalkingDogBoardView';
+import SignUpView from '@/views/signup/SignUpView';
 import MungWikiRegPage from '@/views/mungWiki/MungWikiRegPage';
 
 Vue.use(VueRouter);
@@ -28,6 +29,11 @@ const routes = [
     path: '/walking-dog',
     name: 'WalkingDog',
     component: WalkingDogBoardView,
+  },
+  {
+    path: '/signup',
+    name: 'SignUpView',
+    component: SignUpView,
   },
   {
     path: '/mung-wiki',
